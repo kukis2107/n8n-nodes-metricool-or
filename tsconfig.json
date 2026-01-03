@@ -1,0 +1,41 @@
+{
+    "compilerOptions": {
+        "rootDirs": [
+            "nodes",
+            "credentials"
+        ],
+        "outDir": "dist",
+        "target": "ES2019",
+        "module": "commonjs",
+        "lib": [
+            "ES2019",
+            "DOM"
+        ],
+        "sourceMap": true,
+        "strict": true,
+        "noImplicitAny": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "declaration": true,
+        "declarationMap": true,
+        "resolveJsonModule": true,
+        "removeComments": true,
+        "baseUrl": ".",
+        "paths": {
+            "n8n-workflow": [
+                "node_modules/n8n-workflow"
+            ]
+        }
+    },
+    "include": [
+        "nodes/**/*",
+        "credentials/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist",
+        "**/__tests__/**",
+        "**/*.test.ts",
+        "**/*.spec.ts"
+    ]
+}
