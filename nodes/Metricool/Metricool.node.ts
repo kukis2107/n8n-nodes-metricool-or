@@ -337,7 +337,12 @@ export class Metricool implements INodeType {
                             }
                             const finalData = parsedResponse.data || parsedResponse;
 
-                            returnData.push(...this.helpers.constructExecutionMetaData(this.helpers.returnJsonArray(finalData), { itemData: { item: i } }));
+                            // Convert to array format properly
+                            const dataArray = Array.isArray(finalData) ? finalData : [finalData];
+                            returnData.push(...this.helpers.constructExecutionMetaData(
+                                dataArray.map(item => ({ json: item })),
+                                { itemData: { item: i } }
+                            ));
                         }
                         continue;
                     } else if (operation === 'getScheduledPosts') {
@@ -502,7 +507,12 @@ export class Metricool implements INodeType {
                     finalResponse = (responseData as any).data;
                 }
 
-                returnData.push(...this.helpers.constructExecutionMetaData(this.helpers.returnJsonArray(finalResponse as any), { itemData: { item: i } }));
+                // Convert to array format properly - if already array, use directly; if object, wrap it
+                const dataArray = Array.isArray(finalResponse) ? finalResponse : [finalResponse];
+                returnData.push(...this.helpers.constructExecutionMetaData(
+                    dataArray.map(item => ({ json: item })),
+                    { itemData: { item: i } }
+                ));
             } catch (error) {
                 // If error is already a NodeOperationError, handle it directly
                 if (error instanceof NodeOperationError) {
