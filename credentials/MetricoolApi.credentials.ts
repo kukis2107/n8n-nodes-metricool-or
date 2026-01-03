@@ -34,11 +34,8 @@ export class MetricoolApi implements ICredentialType {
             headers: {
                 'X-Mc-Auth': '={{$credentials.userToken}}',
             },
-            qs: {
-                // userId is safe to send in query string (it's not the secret token)
-                // Only userToken must be kept in headers for security
-                userId: '={{$credentials.userId}}',
-            },
+            // Note: userId is NOT included here globally because not all endpoints require it
+            // It will be added manually in specific operations that need it
         },
     };
     test = {

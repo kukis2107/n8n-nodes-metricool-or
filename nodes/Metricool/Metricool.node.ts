@@ -191,6 +191,14 @@ export class Metricool implements INodeType {
         const operation = this.getNodeParameter('operation', 0) as string;
 
         /**
+         * Helper to get userId from credentials for v2 API endpoints
+         */
+        const getUserId = async (): Promise<string> => {
+            const credentials = await this.getCredentials('metricoolApi');
+            return credentials.userId as string;
+        };
+
+        /**
          * Helper to format dates correctly for Metricool API.
          * Replaces 'T' with space and removes timezone info if present.
          */
@@ -311,7 +319,7 @@ export class Metricool implements INodeType {
                             const response = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
                                 method: 'POST',
                                 url: 'https://app.metricool.com/api/v2/scheduler/posts',
-                                qs: { blogId },
+                                qs: { blogId, userId: await getUserId() },
                                 body: postInfo,
                             });
 
@@ -359,7 +367,7 @@ export class Metricool implements INodeType {
                         responseData = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
                             method: 'PUT',
                             url: `https://app.metricool.com/api/v2/scheduler/posts/${postId}`,
-                            qs: { blogId },
+                            qs: { blogId, userId: await getUserId() },
                             body: { text },
                         });
                     } else if (operation === 'deleteScheduledPost') {
@@ -368,7 +376,7 @@ export class Metricool implements INodeType {
                         responseData = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
                             method: 'DELETE',
                             url: `https://app.metricool.com/api/v2/scheduler/posts/${postId}`,
-                            qs: { blogId },
+                            qs: { blogId, userId: await getUserId() },
                         });
                     } else if (operation === 'getBestTimeToPost') {
                         const blogId = validateBlogId(this.getNodeParameter('blogId', i), this.getNode(), i);
@@ -389,7 +397,7 @@ export class Metricool implements INodeType {
                         responseData = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
                             method: 'GET',
                             url: `https://app.metricool.com/api/v2/scheduler/besttimes/${provider}`,
-                            qs: { blogId, start: startDate, end: endDate, timezone },
+                            qs: { blogId, userId: await getUserId(), start: startDate, end: endDate, timezone },
                         });
                     }
                 } else if (resource === 'analytics') {
@@ -441,7 +449,7 @@ export class Metricool implements INodeType {
                     responseData = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
                         method: 'GET',
                         url: 'https://app.metricool.com/api/v2/advertising/campaigns',
-                        qs: { blogId, from: startDate, to: endDate, 'providers[]': providerMap[operation] },
+                        qs: { blogId, userId: await getUserId(), from: startDate, to: endDate, 'providers[]': providerMap[operation] },
                     });
                 } else if (resource === 'competitor') {
                     const blogId = validateBlogId(this.getNodeParameter('blogId', i), this.getNode(), i);
@@ -484,7 +492,7 @@ export class Metricool implements INodeType {
                     responseData = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
                         method: 'GET',
                         url: `https://app.metricool.com/api/v2/analytics/${endpointMap[operation]}`,
-                        qs: { blogId, from: startDate, to: endDate },
+                        qs: { blogId, userId: await getUserId(), from: startDate, to: endDate },
                     });
                 }
 

@@ -15,23 +15,17 @@ describe('MetricoolApi Credentials', () => {
         expect(credentials.displayName).toBe('Metricool API');
     });
 
-    it('should not expose userToken in query string', () => {
+    it('should not expose credentials in query string globally', () => {
         const auth = credentials.authenticate;
-        // userToken must NEVER be in query string (security risk)
-        // userId is safe to be in query string (it's not the secret)
-        expect((auth.properties as any).qs?.userToken).toBeUndefined();
+        // Credentials should NOT be in global query string
+        // userId will be added manually only in v2 endpoints that need it
+        expect((auth.properties as any).qs).toBeUndefined();
     });
 
     it('should include userToken in headers only', () => {
         const auth = credentials.authenticate;
         expect(auth.properties.headers).toBeDefined();
         expect(auth.properties.headers['X-Mc-Auth']).toBeDefined();
-    });
-
-    it('should include userId in query string', () => {
-        const auth = credentials.authenticate;
-        expect(auth.properties.qs).toBeDefined();
-        expect(auth.properties.qs.userId).toBeDefined();
     });
 
     it('should have valid credential test endpoint', () => {
