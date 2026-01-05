@@ -215,12 +215,14 @@ export class Metricool implements INodeType {
                     if (operation === 'getBrands') {
                         responseData = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
                             method: 'GET',
-                            url: 'https://app.metricool.com/api/v1/brands',
+                            url: 'https://app.metricool.com/api/v2/settings/brands',
+                            qs: { userId: await getUserId() },
                         });
                     } else if (operation === 'getBrandsComplete') {
                         responseData = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
                             method: 'GET',
-                            url: 'https://app.metricool.com/api/v1/brands/complete',
+                            url: 'https://app.metricool.com/api/admin/profiles-auth',
+                            qs: { userId: await getUserId() },
                         });
                     }
                 } else if (resource === 'post') {
