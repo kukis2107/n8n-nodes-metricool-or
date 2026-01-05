@@ -33,19 +33,6 @@ export const competitorOperations: INodeProperties[] = [
 
 export const competitorFields: INodeProperties[] = [
     {
-        displayName: 'Blog ID',
-        name: 'blogId',
-        type: 'number',
-        required: true,
-        displayOptions: {
-            show: {
-                resource: ['competitor'],
-            },
-        },
-        default: 0,
-        description: 'The blog ID of the Metricool brand account',
-    },
-    {
         displayName: 'Network',
         name: 'network',
         type: 'options',
@@ -57,6 +44,10 @@ export const competitorFields: INodeProperties[] = [
         },
         options: [
             {
+                name: 'Bluesky',
+                value: 'bluesky',
+            },
+            {
                 name: 'Facebook',
                 value: 'facebook',
             },
@@ -65,16 +56,16 @@ export const competitorFields: INodeProperties[] = [
                 value: 'instagram',
             },
             {
+                name: 'Twitch',
+                value: 'twitch',
+            },
+            {
                 name: 'Twitter',
                 value: 'twitter',
             },
             {
                 name: 'YouTube',
                 value: 'youtube',
-            },
-            {
-                name: 'Twitch',
-                value: 'twitch',
             },
         ],
         default: 'instagram',

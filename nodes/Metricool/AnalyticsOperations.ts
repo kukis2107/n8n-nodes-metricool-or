@@ -145,20 +145,6 @@ export const analyticsFields: INodeProperties[] = [
         description: 'Timezone for the date range',
     },
     {
-        displayName: 'Blog ID',
-        name: 'blogId',
-        type: 'number',
-        required: true,
-        displayOptions: {
-            show: {
-                resource: ['analytics'],
-                operation: ['getAnalytics'],
-            },
-        },
-        default: 0,
-        description: 'The blog ID of the Metricool brand account',
-    },
-    {
         displayName: 'Start Date',
         name: 'startDate',
         type: 'dateTime',

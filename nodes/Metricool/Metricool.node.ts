@@ -431,12 +431,12 @@ export class Metricool implements INodeType {
                             qs: { network, metric, from: startDate, to: endDate, timezone },
                         });
                     } else if (operation === 'getAnalytics') {
-                        const blogId = validateBlogId(this.getNodeParameter('blogId', i), this.getNode(), i);
                         const metrics = this.getNodeParameter('metrics', i) as string[];
+                        // v2/analytics/timelines does NOT require blogId or userId
                         responseData = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
                             method: 'GET',
                             url: 'https://app.metricool.com/api/v2/analytics/timelines',
-                            qs: { blogId, userId: await getUserId(), network, metric: metrics.join(','), from: startDate, to: endDate, timezone },
+                            qs: { network, metric: metrics.join(','), from: startDate, to: endDate, timezone },
                         });
                     }
                 } else if (resource === 'advertising') {
@@ -482,9 +482,12 @@ export class Metricool implements INodeType {
                             qs: { from: startDate, to: endDate, timezone },
                         });
                     } else if (operation === 'getNetworkCompetitorsPosts') {
+                        // Each network has its own posts endpoint
+                        // Instagram uses 'publications' (posts+reels), others use 'posts'
+                        const postsEndpoint = network === 'instagram' ? 'publications' : 'posts';
                         responseData = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
                             method: 'GET',
-                            url: `https://app.metricool.com/api/v2/analytics/competitors/${network}/posts`,
+                            url: `https://app.metricool.com/api/v2/analytics/competitors/${network}/${postsEndpoint}`,
                             qs: { from: startDate, to: endDate, timezone },
                         });
                     }
