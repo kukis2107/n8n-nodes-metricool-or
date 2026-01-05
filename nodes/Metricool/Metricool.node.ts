@@ -407,11 +407,26 @@ export class Metricool implements INodeType {
                     }
                 } else if (resource === 'analytics') {
                     if (operation === 'getMetrics') {
+                        const blogId = validateBlogId(this.getNodeParameter('blogId', i), this.getNode(), i);
                         const network = this.getNodeParameter('network', i);
+                        const startDate = formatDate(validateDate(
+                            this.getNodeParameter('startDate', i) as string,
+                            'Start Date',
+                            this.getNode(),
+                            i
+                        ));
+                        const endDate = formatDate(validateDate(
+                            this.getNodeParameter('endDate', i) as string,
+                            'End Date',
+                            this.getNode(),
+                            i
+                        ));
+                        const timezone = this.getNodeParameter('timezone', i);
+                        const metrics = this.getNodeParameter('metrics', i) as string[];
                         responseData = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
                             method: 'GET',
-                            url: 'https://app.metricool.com/api/v1/metrics',
-                            qs: { network },
+                            url: 'https://app.metricool.com/api/v2/analytics/aggregation',
+                            qs: { blogId, userId: await getUserId(), network, metric: metrics.join(','), from: startDate, to: endDate, timezone },
                         });
                     } else if (operation === 'getAnalytics') {
                         const blogId = validateBlogId(this.getNodeParameter('blogId', i), this.getNode(), i);
@@ -432,8 +447,8 @@ export class Metricool implements INodeType {
                         const metrics = this.getNodeParameter('metrics', i) as string[];
                         responseData = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
                             method: 'GET',
-                            url: 'https://app.metricool.com/api/v1/analytics',
-                            qs: { blog_id: blogId, network, start: startDate, end: endDate, timezone, metric: metrics.join(',') },
+                            url: 'https://app.metricool.com/api/v2/analytics/timelines',
+                            qs: { blogId, userId: await getUserId(), network, metric: metrics.join(','), from: startDate, to: endDate, timezone },
                         });
                     }
                 } else if (resource === 'advertising') {
@@ -462,43 +477,94 @@ export class Metricool implements INodeType {
                     if (operation === 'getNetworkCompetitors') {
                         responseData = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
                             method: 'GET',
-                            url: 'https://app.metricool.com/api/v1/competitors',
-                            qs: { blog_id: blogId, network },
+                            url: `https://app.metricool.com/api/v2/analytics/competitors/${network}`,
+                            qs: { blogId, userId: await getUserId() },
                         });
                     } else if (operation === 'getNetworkCompetitorsPosts') {
+                        const startDate = formatDate(validateDate(
+                            this.getNodeParameter('startDate', i) as string,
+                            'Start Date',
+                            this.getNode(),
+                            i
+                        ));
+                        const endDate = formatDate(validateDate(
+                            this.getNodeParameter('endDate', i) as string,
+                            'End Date',
+                            this.getNode(),
+                            i
+                        ));
                         responseData = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
                             method: 'GET',
-                            url: 'https://app.metricool.com/api/v1/competitors/posts',
-                            qs: { blog_id: blogId, network },
+                            url: `https://app.metricool.com/api/v2/analytics/competitors/${network}/posts`,
+                            qs: { blogId, userId: await getUserId(), from: startDate, to: endDate },
                         });
                     }
                 } else {
-                    // Logic for social networks (facebook, instagram, etc.) using v2 analytics
+                    // Logic for social networks (facebook, instagram, etc.)
                     const blogId = validateBlogId(this.getNodeParameter('blogId', i), this.getNode(), i);
-                    const startDate = formatDate(validateDate(
+                    const startDate = validateDate(
                         this.getNodeParameter('startDate', i) as string,
                         'Start Date',
                         this.getNode(),
                         i
-                    ));
-                    const endDate = formatDate(validateDate(
+                    );
+                    const endDate = validateDate(
                         this.getNodeParameter('endDate', i) as string,
                         'End Date',
                         this.getNode(),
                         i
-                    ));
-                    const endpointMap: { [key: string]: string } = {
+                    );
+
+                    // Twitter and Twitch use old /stats/ endpoints with YYYYMMDD format
+                    // Other networks use new /v2/analytics/ endpoints with ISO format
+                    const statsOperations: { [key: string]: string } = {
+                        'getTwitchVideos': 'twitch/videos',
+                        'getTwitterPosts': 'twitter/posts',
+                    };
+
+                    const v2EndpointMap: { [key: string]: string } = {
                         'getFacebookPosts': 'posts/facebook', 'getFacebookReels': 'reels/facebook', 'getFacebookStories': 'stories/facebook',
                         'getInstagramPosts': 'posts/instagram', 'getInstagramReels': 'reels/instagram', 'getInstagramStories': 'stories/instagram',
-                        'getTikTokVideos': 'posts/tiktok', 'getYouTubeVideos': 'posts/youtube', 'getLinkedInPosts': 'posts/linkedin',
+                        'getTikTokVideos': 'posts/tiktok', 'getLinkedInPosts': 'posts/linkedin',
                         'getPinterestPins': 'posts/pinterest', 'getThreadsPosts': 'posts/threads', 'getBlueskyPosts': 'posts/bluesky',
-                        'getTwitchVideos': 'posts/twitch', 'getTwitterPosts': 'posts/twitter',
                     };
-                    responseData = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
-                        method: 'GET',
-                        url: `https://app.metricool.com/api/v2/analytics/${endpointMap[operation]}`,
-                        qs: { blogId, userId: await getUserId(), from: startDate, to: endDate },
-                    });
+
+                    if (statsOperations[operation]) {
+                        // Use old /stats/ API with YYYYMMDD format
+                        const formatYYYYMMDD = (date: string) => {
+                            const d = new Date(date);
+                            const year = d.getFullYear();
+                            const month = String(d.getMonth() + 1).padStart(2, '0');
+                            const day = String(d.getDate()).padStart(2, '0');
+                            return parseInt(`${year}${month}${day}`);
+                        };
+
+                        responseData = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
+                            method: 'GET',
+                            url: `https://app.metricool.com/api/stats/${statsOperations[operation]}`,
+                            qs: { blogId, userId: await getUserId(), start: formatYYYYMMDD(startDate), end: formatYYYYMMDD(endDate) },
+                        });
+                    } else if (v2EndpointMap[operation]) {
+                        // Use new /v2/analytics/ API with ISO format
+                        responseData = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
+                            method: 'GET',
+                            url: `https://app.metricool.com/api/v2/analytics/${v2EndpointMap[operation]}`,
+                            qs: { blogId, userId: await getUserId(), from: formatDate(startDate), to: formatDate(endDate) },
+                        });
+                    } else if (operation === 'getYouTubeVideos') {
+                        // YouTube doesn't have a direct posts endpoint in v2
+                        throw new NodeOperationError(
+                            this.getNode(),
+                            `YouTube videos endpoint is not available in the Metricool API. Please contact Metricool support for YouTube analytics access.`,
+                            { itemIndex: i }
+                        );
+                    } else {
+                        throw new NodeOperationError(
+                            this.getNode(),
+                            `Unknown operation: ${operation}`,
+                            { itemIndex: i }
+                        );
+                    }
                 }
 
                 // Parse JSON string response if needed

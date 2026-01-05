@@ -80,4 +80,32 @@ export const competitorFields: INodeProperties[] = [
         default: 'instagram',
         description: 'The social network to get competitors for',
     },
+    {
+        displayName: 'Start Date',
+        name: 'startDate',
+        type: 'dateTime',
+        required: true,
+        displayOptions: {
+            show: {
+                resource: ['competitor'],
+                operation: ['getNetworkCompetitorsPosts'],
+            },
+        },
+        default: '',
+        description: 'Start date for retrieving competitor posts (format: YYYY-MM-DD)',
+    },
+    {
+        displayName: 'End Date',
+        name: 'endDate',
+        type: 'dateTime',
+        required: true,
+        displayOptions: {
+            show: {
+                resource: ['competitor'],
+                operation: ['getNetworkCompetitorsPosts'],
+            },
+        },
+        default: '',
+        description: 'End date for retrieving competitor posts (format: YYYY-MM-DD)',
+    },
 ];
