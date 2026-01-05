@@ -362,8 +362,8 @@ export class Metricool implements INodeType {
                         const timezone = this.getNodeParameter('timezone', i);
                         responseData = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
                             method: 'GET',
-                            url: 'https://app.metricool.com/api/v1/post/scheduled',
-                            qs: { blog_id: blogId, start: startDate, end: endDate, timezone, extendedRange: false },
+                            url: 'https://app.metricool.com/api/v2/scheduler/posts',
+                            qs: { start: startDate, end: endDate, timezone, extendedRange: false },
                         });
                     } else if (operation === 'updateScheduledPost') {
                         const blogId = validateBlogId(this.getNodeParameter('blogId', i), this.getNode(), i);
