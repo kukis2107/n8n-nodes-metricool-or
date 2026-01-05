@@ -408,44 +408,30 @@ export class Metricool implements INodeType {
                         });
                     }
                 } else if (resource === 'analytics') {
+                    const network = this.getNodeParameter('network', i);
+                    const startDate = formatDate(validateDate(
+                        this.getNodeParameter('startDate', i) as string,
+                        'Start Date',
+                        this.getNode(),
+                        i
+                    ));
+                    const endDate = formatDate(validateDate(
+                        this.getNodeParameter('endDate', i) as string,
+                        'End Date',
+                        this.getNode(),
+                        i
+                    ));
+                    const timezone = this.getNodeParameter('timezone', i, 'Europe/Madrid') as string;
+
                     if (operation === 'getMetrics') {
-                        const blogId = validateBlogId(this.getNodeParameter('blogId', i), this.getNode(), i);
-                        const network = this.getNodeParameter('network', i);
-                        const startDate = formatDate(validateDate(
-                            this.getNodeParameter('startDate', i) as string,
-                            'Start Date',
-                            this.getNode(),
-                            i
-                        ));
-                        const endDate = formatDate(validateDate(
-                            this.getNodeParameter('endDate', i) as string,
-                            'End Date',
-                            this.getNode(),
-                            i
-                        ));
-                        const timezone = this.getNodeParameter('timezone', i);
-                        const metrics = this.getNodeParameter('metrics', i) as string[];
+                        const metric = this.getNodeParameter('metric', i) as string;
                         responseData = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
                             method: 'GET',
                             url: 'https://app.metricool.com/api/v2/analytics/aggregation',
-                            qs: { blogId, userId: await getUserId(), network, metric: metrics.join(','), from: startDate, to: endDate, timezone },
+                            qs: { network, metric, from: startDate, to: endDate, timezone },
                         });
                     } else if (operation === 'getAnalytics') {
                         const blogId = validateBlogId(this.getNodeParameter('blogId', i), this.getNode(), i);
-                        const network = this.getNodeParameter('network', i);
-                        const startDate = formatDate(validateDate(
-                            this.getNodeParameter('startDate', i) as string,
-                            'Start Date',
-                            this.getNode(),
-                            i
-                        ));
-                        const endDate = formatDate(validateDate(
-                            this.getNodeParameter('endDate', i) as string,
-                            'End Date',
-                            this.getNode(),
-                            i
-                        ));
-                        const timezone = this.getNodeParameter('timezone', i);
                         const metrics = this.getNodeParameter('metrics', i) as string[];
                         responseData = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
                             method: 'GET',
@@ -474,31 +460,32 @@ export class Metricool implements INodeType {
                         qs: { from: startDate, to: endDate, timezone, 'providers[]': providerMap[operation] },
                     });
                 } else if (resource === 'competitor') {
-                    const blogId = validateBlogId(this.getNodeParameter('blogId', i), this.getNode(), i);
                     const network = this.getNodeParameter('network', i);
+                    const startDate = formatDate(validateDate(
+                        this.getNodeParameter('startDate', i) as string,
+                        'Start Date',
+                        this.getNode(),
+                        i
+                    ));
+                    const endDate = formatDate(validateDate(
+                        this.getNodeParameter('endDate', i) as string,
+                        'End Date',
+                        this.getNode(),
+                        i
+                    ));
+                    const timezone = this.getNodeParameter('timezone', i, 'Europe/Madrid') as string;
+
                     if (operation === 'getNetworkCompetitors') {
                         responseData = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
                             method: 'GET',
                             url: `https://app.metricool.com/api/v2/analytics/competitors/${network}`,
-                            qs: { blogId, userId: await getUserId() },
+                            qs: { from: startDate, to: endDate, timezone },
                         });
                     } else if (operation === 'getNetworkCompetitorsPosts') {
-                        const startDate = formatDate(validateDate(
-                            this.getNodeParameter('startDate', i) as string,
-                            'Start Date',
-                            this.getNode(),
-                            i
-                        ));
-                        const endDate = formatDate(validateDate(
-                            this.getNodeParameter('endDate', i) as string,
-                            'End Date',
-                            this.getNode(),
-                            i
-                        ));
                         responseData = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
                             method: 'GET',
                             url: `https://app.metricool.com/api/v2/analytics/competitors/${network}/posts`,
-                            qs: { blogId, userId: await getUserId(), from: startDate, to: endDate },
+                            qs: { from: startDate, to: endDate, timezone },
                         });
                     }
                 } else {

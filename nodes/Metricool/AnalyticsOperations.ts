@@ -40,7 +40,6 @@ export const analyticsFields: INodeProperties[] = [
         displayOptions: {
             show: {
                 resource: ['analytics'],
-                operation: ['getMetrics', 'getAnalytics'],
             },
         },
         options: [
@@ -87,6 +86,63 @@ export const analyticsFields: INodeProperties[] = [
         ],
         default: 'instagram',
         description: 'Social media network to get metrics/analytics for',
+    },
+    {
+        displayName: 'Metric',
+        name: 'metric',
+        type: 'string',
+        required: true,
+        displayOptions: {
+            show: {
+                resource: ['analytics'],
+                operation: ['getMetrics'],
+            },
+        },
+        default: 'followers',
+        description: 'Metric to aggregate (e.g., followers, likes, comments)',
+        placeholder: 'followers',
+    },
+    {
+        displayName: 'Start Date',
+        name: 'startDate',
+        type: 'dateTime',
+        required: true,
+        displayOptions: {
+            show: {
+                resource: ['analytics'],
+                operation: ['getMetrics'],
+            },
+        },
+        default: '',
+        description: 'Start date for metrics (format: YYYY-MM-DD)',
+    },
+    {
+        displayName: 'End Date',
+        name: 'endDate',
+        type: 'dateTime',
+        required: true,
+        displayOptions: {
+            show: {
+                resource: ['analytics'],
+                operation: ['getMetrics'],
+            },
+        },
+        default: '',
+        description: 'End date for metrics (format: YYYY-MM-DD)',
+    },
+    {
+        displayName: 'Timezone',
+        name: 'timezone',
+        type: 'string',
+        required: false,
+        displayOptions: {
+            show: {
+                resource: ['analytics'],
+                operation: ['getMetrics'],
+            },
+        },
+        default: 'Europe/Madrid',
+        description: 'Timezone for the date range',
     },
     {
         displayName: 'Blog ID',

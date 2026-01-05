@@ -88,11 +88,10 @@ export const competitorFields: INodeProperties[] = [
         displayOptions: {
             show: {
                 resource: ['competitor'],
-                operation: ['getNetworkCompetitorsPosts'],
             },
         },
         default: '',
-        description: 'Start date for retrieving competitor posts (format: YYYY-MM-DD)',
+        description: 'Start date for retrieving competitor data (format: YYYY-MM-DD)',
     },
     {
         displayName: 'End Date',
@@ -102,10 +101,22 @@ export const competitorFields: INodeProperties[] = [
         displayOptions: {
             show: {
                 resource: ['competitor'],
-                operation: ['getNetworkCompetitorsPosts'],
             },
         },
         default: '',
-        description: 'End date for retrieving competitor posts (format: YYYY-MM-DD)',
+        description: 'End date for retrieving competitor data (format: YYYY-MM-DD)',
+    },
+    {
+        displayName: 'Timezone',
+        name: 'timezone',
+        type: 'string',
+        required: false,
+        displayOptions: {
+            show: {
+                resource: ['competitor'],
+            },
+        },
+        default: 'Europe/Madrid',
+        description: 'Timezone for the date range',
     },
 ];
