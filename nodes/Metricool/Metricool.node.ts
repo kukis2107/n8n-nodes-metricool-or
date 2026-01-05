@@ -501,10 +501,24 @@ export class Metricool implements INodeType {
                     });
                 }
 
+                // Parse JSON string response if needed
+                let parsedResponse = responseData;
+                if (typeof responseData === 'string') {
+                    try {
+                        parsedResponse = JSON.parse(responseData);
+                    } catch (error) {
+                        throw new NodeOperationError(
+                            this.getNode(),
+                            `Failed to parse API response: ${(error as Error).message}`,
+                            { itemIndex: i }
+                        );
+                    }
+                }
+
                 // UNWRAP DATA if it's in a .data property (common in v2)
-                let finalResponse = responseData;
-                if (responseData && typeof responseData === 'object' && (responseData as any).data) {
-                    finalResponse = (responseData as any).data;
+                let finalResponse = parsedResponse;
+                if (parsedResponse && typeof parsedResponse === 'object' && (parsedResponse as any).data !== undefined) {
+                    finalResponse = (parsedResponse as any).data;
                 }
 
                 // Convert to array format properly - if already array, use directly; if object, wrap it
