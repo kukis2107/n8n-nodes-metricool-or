@@ -39,19 +39,6 @@ export const advertisingOperations: INodeProperties[] = [
 
 export const advertisingFields: INodeProperties[] = [
     {
-        displayName: 'Blog ID',
-        name: 'blogId',
-        type: 'number',
-        required: true,
-        displayOptions: {
-            show: {
-                resource: ['advertising'],
-            },
-        },
-        default: 0,
-        description: 'The blog ID of the Metricool brand account',
-    },
-    {
         displayName: 'Start Date',
         name: 'startDate',
         type: 'dateTime',
@@ -76,5 +63,18 @@ export const advertisingFields: INodeProperties[] = [
         },
         default: '',
         description: 'End date for retrieving campaigns (format: YYYY-MM-DD)',
+    },
+    {
+        displayName: 'Timezone',
+        name: 'timezone',
+        type: 'string',
+        required: false,
+        displayOptions: {
+            show: {
+                resource: ['advertising'],
+            },
+        },
+        default: 'Europe/Madrid',
+        description: 'Timezone for the date range (e.g., Europe/Madrid, America/New_York)',
     },
 ];

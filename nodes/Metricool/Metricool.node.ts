@@ -454,7 +454,6 @@ export class Metricool implements INodeType {
                         });
                     }
                 } else if (resource === 'advertising') {
-                    const blogId = validateBlogId(this.getNodeParameter('blogId', i), this.getNode(), i);
                     const startDate = formatDate(validateDate(
                         this.getNodeParameter('startDate', i) as string,
                         'Start Date',
@@ -467,11 +466,12 @@ export class Metricool implements INodeType {
                         this.getNode(),
                         i
                     ));
+                    const timezone = this.getNodeParameter('timezone', i, 'Europe/Madrid') as string;
                     const providerMap: { [key: string]: string } = { 'getFacebookAdsCampaigns': 'facebook', 'getGoogleAdsCampaigns': 'google', 'getTikTokAdsCampaigns': 'tiktok' };
                     responseData = await this.helpers.requestWithAuthentication.call(this, 'metricoolApi', {
                         method: 'GET',
                         url: 'https://app.metricool.com/api/v2/advertising/campaigns',
-                        qs: { blogId, userId: await getUserId(), from: startDate, to: endDate, 'providers[]': providerMap[operation] },
+                        qs: { from: startDate, to: endDate, timezone, 'providers[]': providerMap[operation] },
                     });
                 } else if (resource === 'competitor') {
                     const blogId = validateBlogId(this.getNodeParameter('blogId', i), this.getNode(), i);
